@@ -1,36 +1,9 @@
 "use server";
 
-import type { GenderCategory, StudentSearchResult } from "@/lib/database.types";
+import type { GenderCategory } from "@/lib/database.types";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
-
-export type RegisterValues = {
-  name: string;
-  fatherName: string;
-  phone: string;
-  gender: string;
-};
-
-/**
- * Errors are returned as keys rather than sentences so the action stays
- * locale-agnostic; the form looks them up in the `register.errors` namespace.
- */
-export type RegisterState =
-  | { status: "idle" }
-  | {
-      status: "invalid";
-      values: RegisterValues;
-      fieldErrors: Partial<Record<keyof RegisterValues, string>>;
-    }
-  | { status: "failed"; values: RegisterValues; reason: string }
-  | {
-      status: "duplicate";
-      values: RegisterValues;
-      matches: StudentSearchResult[];
-    }
-  | { status: "success"; name: string; circleSlug: string | null };
-
-export const initialRegisterState: RegisterState = { status: "idle" };
+import type { RegisterState, RegisterValues } from "./state";
 
 const MAX_LENGTH = 80;
 
@@ -38,7 +11,6 @@ function readValues(formData: FormData): RegisterValues {
   const read = (key: string) => String(formData.get(key) ?? "").trim();
   return {
     name: read("name"),
-    fatherName: read("fatherName"),
     phone: read("phone"),
     gender: read("gender"),
   };
@@ -56,8 +28,6 @@ export async function registerStudent(
   const fieldErrors: Partial<Record<keyof RegisterValues, string>> = {};
   if (!values.name) fieldErrors.name = "nameRequired";
   else if (values.name.length > MAX_LENGTH) fieldErrors.name = "tooLong";
-  if (!values.fatherName) fieldErrors.fatherName = "fatherRequired";
-  else if (values.fatherName.length > MAX_LENGTH) fieldErrors.fatherName = "tooLong";
   if (values.gender !== "male" && values.gender !== "female") {
     fieldErrors.gender = "genderRequired";
   }
@@ -73,13 +43,16 @@ export async function registerStudent(
 
   const gender = values.gender as GenderCategory;
   const supabase = await createClient();
+  // Kept for compatibility with the existing database schema. New students
+  // only need to enter their name once in the simplified form.
+  const fatherName = "-";
 
   // Risk 2 in the brief: warn on an identical name + father's name rather than
   // blocking it, since real people do share both.
   if (!confirmedDuplicate) {
     const { data: matches, error } = await supabase.rpc("find_similar_students", {
       p_name: values.name,
-      p_father_name: values.fatherName,
+      p_father_name: fatherName,
       p_gender: gender,
     });
 
@@ -95,7 +68,7 @@ export async function registerStudent(
 
   const { error } = await supabase.from("students").insert({
     name: values.name,
-    father_name: values.fatherName,
+    father_name: fatherName,
     phone: values.phone || null,
     gender_category: gender,
   });

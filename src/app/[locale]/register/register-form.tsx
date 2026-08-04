@@ -4,11 +4,8 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import {
-  initialRegisterState,
-  registerStudent,
-  type RegisterState,
-} from "./actions";
+import { registerStudent } from "./actions";
+import { initialRegisterState, type RegisterState } from "./state";
 
 function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
@@ -16,6 +13,37 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
     <button type="submit" className="btn-primary w-full" disabled={pending}>
       {pending ? pendingLabel : label}
     </button>
+  );
+}
+
+function StudentIcon({ gender }: { gender: "male" | "female" }) {
+  if (gender === "male") {
+    return (
+      <svg
+        viewBox="0 0 48 48"
+        aria-hidden="true"
+        className="h-8 w-8 shrink-0 fill-current"
+      >
+        <path d="M14.2 17.3c.4-7.1 4.2-11.1 10.3-11.1 5.8 0 9.4 3.7 9.4 10.3 0 1.2-.1 2.2-.3 3.2-1.7-3.2-4.3-5.4-7.8-6.5-2.6 2.6-6.5 4.1-11.6 4.1Z" />
+        <path d="M15.3 18.7c.6 6.4 4.1 10.8 9.2 10.8 5 0 8.5-4.2 9.1-10.4-3.1-1-5.8-2.5-8-4.6-2.7 2.3-6.1 3.7-10.3 4.2Z" />
+        <path d="M7.5 43c.7-7.6 5.4-12 12.5-13.3 1.2 1.5 2.7 2.3 4.5 2.3s3.3-.8 4.5-2.3C36.1 31 40.8 35.4 41.5 43h-34Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+      className="h-8 w-8 shrink-0 fill-current"
+    >
+      <path d="M11.5 29.8c2.1-2.4 2.7-5.4 2.7-9.7 0-8.7 4-14.1 10.3-14.1s10.3 5.4 10.3 14.1c0 4.3.6 7.3 2.7 9.7-2.6 1.2-5.2 1.4-7.7.7a10.3 10.3 0 0 1-10.6 0c-2.5.7-5.1.5-7.7-.7Z" />
+      <path
+        d="M18.1 18.1c.8 6.3 3 9.5 6.4 9.5 3.5 0 5.7-3.2 6.4-9.5-2.8-.8-5-2.2-6.4-4.3-1.4 2.1-3.6 3.5-6.4 4.3Z"
+        className="fill-surface"
+      />
+      <path d="M7.5 43c.7-7.5 5.1-11.8 12.1-13.2 1.3 1.4 2.9 2.2 4.9 2.2s3.6-.8 4.9-2.2C36.4 31.2 40.8 35.5 41.5 43h-34Z" />
+    </svg>
   );
 }
 
@@ -79,29 +107,6 @@ export function RegisterForm({ circleSlug }: { circleSlug: string | null }) {
         )}
       </div>
 
-      <div>
-        <label className="field-label" htmlFor="fatherName">
-          {t("fields.fatherName")}
-        </label>
-        <input
-          id="fatherName"
-          name="fatherName"
-          className="input"
-          defaultValue={values?.fatherName}
-          autoComplete="off"
-          aria-invalid={Boolean(fieldErrors.fatherName)}
-          aria-describedby="fatherName-hint"
-        />
-        <p id="fatherName-hint" className="mt-1.5 text-sm text-muted-foreground">
-          {t("fields.fatherNameHint")}
-        </p>
-        {fieldErrors.fatherName && (
-          <p className="mt-1.5 text-sm text-absent">
-            {t(`errors.${fieldErrors.fatherName}`)}
-          </p>
-        )}
-      </div>
-
       <fieldset>
         <legend className="field-label">{t("fields.gender")}</legend>
         <div className="flex gap-3">
@@ -121,6 +126,7 @@ export function RegisterForm({ circleSlug }: { circleSlug: string | null }) {
                 defaultChecked={values?.gender === option}
                 className="accent-brand-600"
               />
+              <StudentIcon gender={option} />
               {t(`fields.${option}`)}
             </label>
           ))}
@@ -160,7 +166,7 @@ export function RegisterForm({ circleSlug }: { circleSlug: string | null }) {
           <ul className="mt-2 list-disc space-y-1 ps-5 text-sm">
             {state.matches.map((match) => (
               <li key={match.id}>
-                {match.name} — {match.father_name}
+                {match.name}
               </li>
             ))}
           </ul>

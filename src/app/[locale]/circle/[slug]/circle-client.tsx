@@ -152,7 +152,7 @@ export function CircleClient({
 
   return (
     <div className="flex flex-col gap-6">
-      {joined && myPosition !== undefined ? (
+      {joined && myPosition !== undefined && (
         <section className="card border-brand-200 bg-brand-50 dark:border-brand-800 dark:bg-surface">
           <h2 className="text-lg font-semibold">
             {t("joined.title", { name: joined.name })}
@@ -161,8 +161,9 @@ export function CircleClient({
             {t("joined.position", { position: String(myPosition) })}
           </p>
         </section>
-      ) : (
-        <section className="card">
+      )}
+
+      <section className="card">
           <label className="field-label" htmlFor="student-search">
             {t("search.label")}
           </label>
@@ -202,9 +203,11 @@ export function CircleClient({
                   >
                     <span>
                       <span className="block font-semibold">{student.name}</span>
-                      <span className="block text-sm text-muted-foreground">
-                        {t("search.fatherLabel", { name: student.father_name })}
-                      </span>
+                      {student.father_name !== "-" && (
+                        <span className="block text-sm text-muted-foreground">
+                          {t("search.fatherLabel", { name: student.father_name })}
+                        </span>
+                      )}
                     </span>
                     <span className="text-sm font-semibold text-brand-600 dark:text-brand-300">
                       {joining === student.id
@@ -235,8 +238,7 @@ export function CircleClient({
           {error && (
             <p className="mt-3 text-sm text-absent">{t(`errors.${error}`)}</p>
           )}
-        </section>
-      )}
+      </section>
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">
@@ -271,9 +273,11 @@ export function CircleClient({
                         </span>
                       )}
                     </span>
-                    <span className="block truncate text-sm text-muted-foreground">
-                      {entry.father_name}
-                    </span>
+                    {entry.father_name !== "-" && (
+                      <span className="block truncate text-sm text-muted-foreground">
+                        {entry.father_name}
+                      </span>
+                    )}
                   </span>
                   <span className={badgeClass(entry.recitation_status)}>
                     {t(`status.${entry.recitation_status}`)}

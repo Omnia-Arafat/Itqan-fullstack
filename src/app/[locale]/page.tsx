@@ -20,27 +20,46 @@ export default async function Home({ params }: HomeProps) {
         <p className="mt-2 text-muted-foreground">{t("subtitle")}</p>
       </section>
 
-      <section className="card border-brand-200 bg-brand-50 dark:border-brand-800 dark:bg-surface">
-        <h2 className="text-xl font-semibold">{t("newStudent.title")}</h2>
-        <p className="mt-2 text-muted-foreground">{t("newStudent.body")}</p>
-        <Link href="/register" className="btn-primary mt-4 w-full sm:w-auto">
-          {t("newStudent.cta")}
-        </Link>
+      {/*
+        Two doors, deliberately side by side. The two audiences are entirely
+        separate: students never authenticate, teachers always do.
+      */}
+      <section className="grid gap-4 sm:grid-cols-2">
+        <div className="card flex flex-col border-brand-200 bg-brand-50 dark:border-brand-800 dark:bg-surface">
+          <span className="badge-done self-start">{t("doors.students.tag")}</span>
+          <h2 className="mt-3 text-xl font-semibold">{t("doors.students.title")}</h2>
+          <p className="mt-2 flex-1 text-muted-foreground">
+            {t("doors.students.body")}
+          </p>
+          <Link href="/register" className="btn-primary mt-4 w-full">
+            {t("doors.students.cta")}
+          </Link>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {t("doors.students.note")}
+          </p>
+        </div>
+
+        <div className="card flex flex-col">
+          <span className="badge-waiting self-start">{t("doors.teachers.tag")}</span>
+          <h2 className="mt-3 text-xl font-semibold">{t("doors.teachers.title")}</h2>
+          <p className="mt-2 flex-1 text-muted-foreground">
+            {t("doors.teachers.body")}
+          </p>
+          <Link href="/login" className="btn-secondary mt-4 w-full">
+            {t("doors.teachers.cta")}
+          </Link>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {t("doors.teachers.note")}
+          </p>
+        </div>
       </section>
 
       <section className="card">
-        <h2 className="text-xl font-semibold">{t("returningStudent.title")}</h2>
+        <h2 className="text-base font-semibold">{t("returningStudent.title")}</h2>
         <p className="mt-2 text-muted-foreground">{t("returningStudent.body")}</p>
         <p className="mt-3 text-sm text-muted-foreground">
           {t("returningStudent.note")}
         </p>
-      </section>
-
-      <section className="card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-base font-semibold">{t("teacher.title")}</h2>
-        <Link href="/login" className="btn-secondary w-full sm:w-auto">
-          {t("teacher.cta")}
-        </Link>
       </section>
     </div>
   );

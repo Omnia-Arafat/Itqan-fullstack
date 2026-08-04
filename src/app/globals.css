@@ -138,6 +138,6 @@
 
   .badge-done {
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1
-           text-xs font-semibold bg-brand-100 text-brand-800;
+           text-xs font-semibold bg-surface-muted text-muted-foreground;
   }
 }

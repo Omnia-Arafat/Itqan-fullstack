@@ -12,7 +12,8 @@ export function SetupNotice() {
       <p className="font-semibold">{t("title")}</p>
       <p className="mt-1 text-sm">{t("body")}</p>
       <code className="mt-2 block text-xs" dir="ltr">
-        .env.local → NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+        .env.local → NEXT_PUBLIC_SUPABASE_URL,
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
       </code>
     </div>
   );

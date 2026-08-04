@@ -1,5 +1,5 @@
 /**
- * Hand-written to match supabase/migrations/0001_init.sql.
+ * Hand-written to match supabase/migrations/20260804150000_init.sql.
  *
  * Once the migration is applied you can regenerate this file instead of
  * maintaining it by hand:

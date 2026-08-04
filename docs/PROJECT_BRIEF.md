@@ -138,8 +138,8 @@ every public operation goes through a `SECURITY DEFINER` RPC.
 
 ## 9. Data Model
 
-`supabase/migrations/0001_init.sql` is the source of truth. Summary of the corrections
-it makes to the v1 schema:
+`supabase/migrations/20260804150000_init.sql` is the source of truth. Summary of the
+corrections it makes to the v1 schema:
 
 | # | v1 problem | Fix |
 |---|---|---|
@@ -163,7 +163,7 @@ it makes to the v1 schema:
 Each milestone stops for review before the next begins.
 
 **Setup** — Next.js + Tailwind + `next-intl` (ar default, auto RTL) + Supabase client +
-`.env.local`; run `0001_init.sql`.
+`.env.local`; run `20260804150000_init.sql`.
 
 **Milestone A** — `/register` and `/circle/[slug]`, bilingual from the first commit.
 *Note:* the circle page needs a circle to exist, but circle creation lands in
