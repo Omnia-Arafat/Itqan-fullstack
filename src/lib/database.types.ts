@@ -123,6 +123,9 @@ export type AttendanceReportRow = {
 type Insert<T, Optional extends keyof T> = Omit<T, Optional> &
   Partial<Pick<T, Optional>>;
 
+/** Matches Supabase's generated shape: every table needs a Relationships key. */
+type Empty = { [_ in never]: never };
+
 export type Database = {
   public: {
     Tables: {
@@ -130,11 +133,13 @@ export type Database = {
         Row: Teacher;
         Insert: Insert<Teacher, "id" | "created_at" | "role" | "is_active" | "auth_user_id">;
         Update: Partial<Teacher>;
+        Relationships: [];
       };
       students: {
         Row: Student;
         Insert: Insert<Student, "id" | "created_at" | "search_key" | "phone">;
         Update: Partial<Student>;
+        Relationships: [];
       };
       circles: {
         Row: Circle;
@@ -143,17 +148,20 @@ export type Database = {
           "id" | "created_at" | "is_active" | "timezone" | "duration_minutes" | "days_of_week"
         >;
         Update: Partial<Circle>;
+        Relationships: [];
       };
       attendance_records: {
         Row: AttendanceRecord;
-        // Inserted only through join_circle(); never written directly.
-        Insert: never;
+        // Rows are created only by join_circle(); no RLS policy allows a direct
+        // insert, so this type exists to satisfy the client, not to be used.
+        Insert: Insert<AttendanceRecord, "id" | "created_at" | "joined_at">;
         Update: Partial<
           Pick<AttendanceRecord, "attendance_status" | "recitation_status" | "queue_order">
         >;
+        Relationships: [];
       };
     };
-    Views: Record<string, never>;
+    Views: Empty;
     Functions: {
       circle_public_info: {
         Args: { p_slug: string };
@@ -176,7 +184,7 @@ export type Database = {
         Returns: QueueEntry[];
       };
       teacher_today_circles: {
-        Args: Record<string, never>;
+        Args: Record<PropertyKey, never>;
         Returns: TeacherTodayCircle[];
       };
       reorder_queue: {
@@ -198,7 +206,7 @@ export type Database = {
         Returns: AttendanceReportRow[];
       };
     };
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
+    Enums: Empty;
+    CompositeTypes: Empty;
   };
 };

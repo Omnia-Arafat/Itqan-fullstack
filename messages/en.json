@@ -36,6 +36,93 @@
       "cta": "Sign in"
     }
   },
+  "register": {
+    "title": "Register a new student",
+    "subtitle": "You only register once. After that you join any circle by searching for your name.",
+    "fields": {
+      "name": "Name",
+      "fatherName": "Father's name",
+      "fatherNameHint": "Used to tell you apart from similar names.",
+      "gender": "Section",
+      "male": "Male students",
+      "female": "Female students",
+      "phone": "WhatsApp number",
+      "phoneHint": "Only used to reach you if needed.",
+      "optional": "optional"
+    },
+    "submit": "Register",
+    "submitting": "Registering…",
+    "success": {
+      "title": "Registered",
+      "body": "Welcome, {name}. Your name is now saved permanently.",
+      "backToCircle": "Back to the circle",
+      "nextStep": "Open your circle's link and search for your name to join the queue."
+    },
+    "duplicate": {
+      "title": "A matching name is already registered",
+      "body": "If this is you, do not register again — go back to your circle's link and search for your name.",
+      "confirm": "This is not me, continue",
+      "hint": "Registering twice splits your attendance across two records."
+    },
+    "errors": {
+      "nameRequired": "Name is required.",
+      "fatherRequired": "Father's name is required.",
+      "genderRequired": "Choose a section.",
+      "tooLong": "That is too long.",
+      "generic": "Registration could not be completed. Please try again.",
+      "notConfigured": "The database is not connected yet."
+    }
+  },
+  "circle": {
+    "title": "Circle",
+    "notFoundPage": {
+      "title": "Circle not found"
+    },
+    "type": {
+      "tasheeh": "Recitation correction",
+      "tajweed": "Tajweed",
+      "free_recitation": "Free recitation"
+    },
+    "startsAt": "Starts at {time}",
+    "openSession": "Open the session",
+    "notToday": "This circle is not scheduled to meet today.",
+    "search": {
+      "label": "Search for your name",
+      "placeholder": "Type the first two letters of your name",
+      "hint": "At least two letters. Results show the father's name to tell similar names apart.",
+      "searching": "Searching…",
+      "fatherLabel": "Father: {name}",
+      "join": "Join",
+      "joining": "Joining…"
+    },
+    "notFound": {
+      "title": "We could not find your name",
+      "body": "If this is your first time, register once and then come back to this page.",
+      "cta": "Register"
+    },
+    "joined": {
+      "title": "You are on the list, {name}",
+      "position": "You are number {position} in the queue."
+    },
+    "queue": {
+      "title": "Queue ({count})",
+      "empty": "Nobody has joined yet. Be the first.",
+      "you": "(you)"
+    },
+    "status": {
+      "waiting": "Waiting",
+      "reciting": "Reciting now",
+      "done": "Done"
+    },
+    "errors": {
+      "generic": "That did not work. Please try again.",
+      "genderMismatch": "You cannot join a circle from a different section."
+    }
+  },
+  "setup": {
+    "title": "Database not connected",
+    "body": "Add your Supabase project credentials, then restart the dev server."
+  },
   "common": {
     "loading": "Loading…",
     "save": "Save",
@@ -48,6 +135,7 @@
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "notFound": "Page not found.",
-    "notFoundBody": "That link is incorrect or no longer available."
+    "notFoundBody": "That link is incorrect or no longer available.",
+    "backHome": "Back to home"
   }
 }
