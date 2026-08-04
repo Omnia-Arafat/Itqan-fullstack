@@ -1,0 +1,53 @@
+{
+  "app": {
+    "name": "Itqan Academy",
+    "tagline": "Quran circles management platform",
+    "description": "Student registration, recitation queue, and attendance tracking in one place."
+  },
+  "language": {
+    "label": "Language",
+    "ar": "العربية",
+    "en": "English",
+    "switchTo": "Switch to Arabic"
+  },
+  "nav": {
+    "home": "Home",
+    "register": "Register a student",
+    "login": "Teacher login",
+    "dashboard": "Teacher dashboard",
+    "admin": "Admin dashboard",
+    "reports": "Attendance reports"
+  },
+  "home": {
+    "title": "Itqan Academy",
+    "subtitle": "Quran circles management platform",
+    "newStudent": {
+      "title": "New student?",
+      "body": "Register once with your name and your father's name. After that you join any circle by searching for your name.",
+      "cta": "Register"
+    },
+    "returningStudent": {
+      "title": "Already registered?",
+      "body": "Open your circle's link and search for your name to join today's queue. No need to register again.",
+      "note": "Your teacher shares the circle link with you."
+    },
+    "teacher": {
+      "title": "Teacher or supervisor?",
+      "cta": "Sign in"
+    }
+  },
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search",
+    "back": "Back",
+    "required": "required",
+    "optional": "optional"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "notFound": "Page not found.",
+    "notFoundBody": "That link is incorrect or no longer available."
+  }
+}
