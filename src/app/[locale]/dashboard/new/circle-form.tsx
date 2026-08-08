@@ -130,10 +130,10 @@ export function CircleForm({
         <input
           id="sessionLink"
           name="sessionLink"
-          type="url"
+          type="text"
           dir="ltr"
           inputMode="url"
-          placeholder="https://meet.google.com/..."
+          placeholder="meet.google.com/... or https://meet.google.com/..."
           className="input text-start"
           defaultValue={values?.sessionLink}
           autoComplete="off"

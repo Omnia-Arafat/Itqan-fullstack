@@ -13,6 +13,12 @@ const CIRCLE_TYPES: CircleType[] = ["tasheeh", "tajweed", "free_recitation"];
 const SLUG_PATTERN = /^halaqa-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+function normalizeSessionLink(value: string): string {
+  if (!value) return value;
+  if (/^https?:\/\//i.test(value)) return value;
+  return `https://${value}`;
+}
+
 function readValues(formData: FormData): CircleValues {
   const read = (key: string) => String(formData.get(key) ?? "").trim();
 
@@ -48,9 +54,11 @@ function validate(values: CircleValues): CircleFieldErrors {
   if (!values.sessionLink) {
     errors.sessionLink = "linkRequired";
   } else {
+    const normalizedLink = normalizeSessionLink(values.sessionLink);
+
     // A link the students cannot open is worse than no circle at all.
     try {
-      const url = new URL(values.sessionLink);
+      const url = new URL(normalizedLink);
       if (url.protocol !== "http:" && url.protocol !== "https:") {
         errors.sessionLink = "linkInvalid";
       }
@@ -100,6 +108,8 @@ export async function createCircle(
     return { status: "failed", values, reason: "generic" };
   }
 
+  const sessionLink = normalizeSessionLink(values.sessionLink);
+
   const supabase = await createClient();
   const { error } = await supabase.from("circles").insert({
     // Never a form field — the brief is explicit about this.
@@ -107,7 +117,7 @@ export async function createCircle(
     name: values.name,
     type: values.type as CircleType,
     gender_category: values.gender as GenderCategory,
-    session_link: values.sessionLink,
+    session_link: sessionLink,
     timezone: values.timezone,
     start_time: values.startTime,
     duration_minutes: Number(values.duration),
