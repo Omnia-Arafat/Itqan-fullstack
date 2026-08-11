@@ -54,6 +54,7 @@ export async function registerStudent(
       p_name: values.name,
       p_father_name: fatherName,
       p_gender: gender,
+      p_academy_id: "00000000-0000-0000-0000-000000000000", // legacy route — no academy context
     });
 
     if (error) {

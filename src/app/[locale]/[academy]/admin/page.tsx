@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { ChevronForward } from "@/components/back-link";
 import { requireTeacherSession, isActiveTeacher } from "@/lib/auth/dal";
 import { TeacherAccountNotice } from "@/components/teacher-account-notice";
 import { createClient } from "@/lib/supabase/server";
@@ -48,10 +49,8 @@ export default async function AdminPage({ params }: AdminPageProps) {
   if (session.teacher.role !== "admin") {
     return (
       <div className="card">
-        <h2 className="text-xl font-semibold">Access Denied</h2>
-        <p className="mt-2 text-muted-foreground">
-          You need admin privileges to access this page.
-        </p>
+        <h2 className="text-xl font-semibold">{t("accessDenied")}</h2>
+        <p className="mt-2 text-muted-foreground">{t("adminRequired")}</p>
       </div>
     );
   }
@@ -92,15 +91,15 @@ export default async function AdminPage({ params }: AdminPageProps) {
       {/* Statistics */}
       <section className="grid gap-4 sm:grid-cols-3">
         <div className="card">
-          <p className="text-sm text-muted-foreground">Active Circles</p>
+          <p className="text-sm text-muted-foreground">{t("stats.circles")}</p>
           <p className="mt-1 text-3xl font-bold">{circlesCount}</p>
         </div>
         <div className="card">
-          <p className="text-sm text-muted-foreground">Registered Students</p>
+          <p className="text-sm text-muted-foreground">{t("stats.students")}</p>
           <p className="mt-1 text-3xl font-bold">{studentsCount}</p>
         </div>
         <div className="card">
-          <p className="text-sm text-muted-foreground">Active Teachers</p>
+          <p className="text-sm text-muted-foreground">{t("stats.teachers")}</p>
           <p className="mt-1 text-3xl font-bold">{teachersCount}</p>
         </div>
       </section>
@@ -118,14 +117,12 @@ export default async function AdminPage({ params }: AdminPageProps) {
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">Manage Circles</h3>
+              <h3 className="font-semibold">{t("circles.manage")}</h3>
               <p className="text-sm text-muted-foreground">
-                Create, edit, and delete halaqas
+                {t("circles.manageSubtitle")}
               </p>
             </div>
-            <svg className="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronForward />
           </div>
         </Link>
 
@@ -140,14 +137,12 @@ export default async function AdminPage({ params }: AdminPageProps) {
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">Manage Students</h3>
+              <h3 className="font-semibold">{t("students.title")}</h3>
               <p className="text-sm text-muted-foreground">
-                View, edit, and delete student records
+                {t("students.subtitle")}
               </p>
             </div>
-            <svg className="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronForward />
           </div>
         </Link>
 
@@ -162,14 +157,12 @@ export default async function AdminPage({ params }: AdminPageProps) {
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">Attendance Reports</h3>
+              <h3 className="font-semibold">{t("reportsCard.title")}</h3>
               <p className="text-sm text-muted-foreground">
-                View detailed attendance analytics
+                {t("reportsCard.subtitle")}
               </p>
             </div>
-            <svg className="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronForward />
           </div>
         </Link>
 
@@ -184,14 +177,12 @@ export default async function AdminPage({ params }: AdminPageProps) {
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">My Dashboard</h3>
+              <h3 className="font-semibold">{t("dashboardCard.title")}</h3>
               <p className="text-sm text-muted-foreground">
-                Back to teacher dashboard
+                {t("dashboardCard.subtitle")}
               </p>
             </div>
-            <svg className="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronForward />
           </div>
         </Link>
       </section>

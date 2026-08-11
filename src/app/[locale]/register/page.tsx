@@ -1,44 +1,17 @@
-import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import { SetupNotice } from "@/components/setup-notice";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { RegisterForm } from "./register-form";
+import { redirect } from "next/navigation";
+import { getAcademies } from "@/lib/academy-dal";
+import { getLocale } from "next-intl/server";
 
-type RegisterPageProps = {
-  params: Promise<{ locale: string }>;
-  searchParams: Promise<{ circle?: string }>;
-};
+export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params,
-}: Pick<RegisterPageProps, "params">): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "register" });
-  return { title: t("title") };
-}
+// Old /register route — redirect to the first academy's register, or the selector
+export default async function OldRegisterPage() {
+  const locale = await getLocale();
+  const academies = await getAcademies();
 
-export default async function RegisterPage({
-  params,
-  searchParams,
-}: RegisterPageProps) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+  if (academies.length === 1) {
+    redirect(`/${locale}/${academies[0].slug}/register`);
+  }
 
-  const { circle } = await searchParams;
-  const t = await getTranslations("register");
-
-  return (
-    <div className="flex flex-col gap-6">
-      <section>
-        <h1 className="font-display text-2xl font-bold sm:text-3xl">
-          {t("title")}
-        </h1>
-        <p className="mt-2 text-muted-foreground">{t("subtitle")}</p>
-      </section>
-
-      {!isSupabaseConfigured() && <SetupNotice />}
-
-      <RegisterForm circleSlug={circle ?? null} />
-    </div>
-  );
+  redirect(`/${locale}`);
 }

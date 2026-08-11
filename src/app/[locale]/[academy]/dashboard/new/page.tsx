@@ -3,15 +3,14 @@ import { randomUUID } from "node:crypto";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SetupNotice } from "@/components/setup-notice";
 import { TeacherAccountNotice } from "@/components/teacher-account-notice";
-import { Link } from "@/i18n/navigation";
+import { BackLink } from "@/components/back-link";
 import { isActiveTeacher, requireTeacherSession } from "@/lib/auth/dal";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { DEFAULT_TIMEZONE } from "@/lib/timezones";
 import { CircleForm } from "./circle-form";
 
-type NewCirclePageProps = { params: Promise<{ locale: string }> };
+type NewCirclePageProps = { params: Promise<{ locale: string; academy: string }> };
 
-/** Authorized route: never prerender it. See the note in `../page.tsx`. */
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
@@ -23,11 +22,11 @@ export async function generateMetadata({
 }
 
 export default async function NewCirclePage({ params }: NewCirclePageProps) {
-  const { locale } = await params;
+  const { locale, academy: academySlug } = await params;
   setRequestLocale(locale);
 
   const t = await getTranslations("dashboard.new");
-  const session = await requireTeacherSession("/dashboard/new");
+  const session = await requireTeacherSession(`/${academySlug}/dashboard/new`);
 
   if (!isActiveTeacher(session)) {
     return (
@@ -41,12 +40,7 @@ export default async function NewCirclePage({ params }: NewCirclePageProps) {
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <Link
-          href="/dashboard"
-          className="text-sm font-medium text-brand-600 dark:text-brand-300"
-        >
-          ← {t("back")}
-        </Link>
+        <BackLink href={`/${academySlug}/dashboard`}>{t("back")}</BackLink>
         <h1 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
           {t("title")}
         </h1>
@@ -59,6 +53,7 @@ export default async function NewCirclePage({ params }: NewCirclePageProps) {
         defaultTimezone={DEFAULT_TIMEZONE}
         registrationSlug={`halaqa-${randomUUID()}`}
         locale={locale}
+        academySlug={academySlug}
       />
     </div>
   );

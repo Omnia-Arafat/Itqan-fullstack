@@ -12,6 +12,20 @@ export type AttendanceStatus = "pending" | "present" | "absent";
 export type RecitationStatus = "waiting" | "reciting" | "done";
 export type TeacherRole = "teacher" | "admin";
 
+export type Academy = {
+  id: string;
+  slug: string;
+  name_ar: string;
+  name_en: string;
+  description_ar: string | null;
+  description_en: string | null;
+  logo_path: string | null;
+  primary_color: string;
+  accent_color: string;
+  is_active: boolean;
+  created_at: string;
+};
+
 export type Teacher = {
   id: string;
   auth_user_id: string | null;
@@ -19,6 +33,7 @@ export type Teacher = {
   gender_category: GenderCategory;
   role: TeacherRole;
   is_active: boolean;
+  academy_id: string;
   created_at: string;
 };
 
@@ -29,6 +44,7 @@ export type Student = {
   phone: string | null;
   gender_category: GenderCategory;
   search_key: string;
+  academy_id: string;
   created_at: string;
 };
 
@@ -46,6 +62,7 @@ export type Circle = {
   days_of_week: number[];
   registration_slug: string;
   is_active: boolean;
+  academy_id: string;
   created_at: string;
 };
 
@@ -71,6 +88,7 @@ export type CirclePublicInfo = {
   timezone: string;
   session_date: string;
   meets_today: boolean;
+  academy_id: string;
 };
 
 export type StudentSearchResult = {
@@ -129,6 +147,12 @@ type Empty = { [_ in never]: never };
 export type Database = {
   public: {
     Tables: {
+      academies: {
+        Row: Academy;
+        Insert: Insert<Academy, "id" | "created_at" | "is_active" | "description_ar" | "description_en" | "logo_path">;
+        Update: Partial<Academy>;
+        Relationships: [];
+      };
       teachers: {
         Row: Teacher;
         Insert: Insert<Teacher, "id" | "created_at" | "role" | "is_active" | "auth_user_id">;
@@ -137,7 +161,7 @@ export type Database = {
       };
       students: {
         Row: Student;
-        Insert: Insert<Student, "id" | "created_at" | "search_key" | "phone">;
+        Insert: Insert<Student, "id" | "created_at" | "search_key" | "phone" | "academy_id">;
         Update: Partial<Student>;
         Relationships: [];
       };
@@ -145,7 +169,7 @@ export type Database = {
         Row: Circle;
         Insert: Insert<
           Circle,
-          "id" | "created_at" | "is_active" | "timezone" | "duration_minutes" | "days_of_week"
+          "id" | "created_at" | "is_active" | "timezone" | "duration_minutes" | "days_of_week" | "academy_id"
         >;
         Update: Partial<Circle>;
         Relationships: [];
@@ -163,6 +187,10 @@ export type Database = {
     };
     Views: Empty;
     Functions: {
+      get_academy: {
+        Args: { p_slug: string };
+        Returns: Academy[];
+      };
       circle_public_info: {
         Args: { p_slug: string };
         Returns: CirclePublicInfo[];
@@ -172,7 +200,7 @@ export type Database = {
         Returns: StudentSearchResult[];
       };
       find_similar_students: {
-        Args: { p_name: string; p_father_name: string; p_gender: GenderCategory };
+        Args: { p_name: string; p_father_name: string; p_gender: GenderCategory; p_academy_id: string };
         Returns: StudentSearchResult[];
       };
       join_circle: {
@@ -202,6 +230,7 @@ export type Database = {
           p_gender?: GenderCategory | null;
           p_circle_id?: string | null;
           p_teacher_id?: string | null;
+          p_academy_id?: string | null;
         };
         Returns: AttendanceReportRow[];
       };

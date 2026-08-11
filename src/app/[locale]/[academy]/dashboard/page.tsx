@@ -8,14 +8,8 @@ import { isActiveTeacher, requireTeacherSession } from "@/lib/auth/dal";
 import type { Circle } from "@/lib/database.types";
 import { createClient } from "@/lib/supabase/server";
 
-type DashboardPageProps = { params: Promise<{ locale: string }> };
+type DashboardPageProps = { params: Promise<{ locale: string; academy: string }> };
 
-/**
- * The locale layout's `generateStaticParams` makes every child a prerender
- * candidate, and this page only reads cookies once Supabase credentials exist —
- * so without this it would be statically baked at build time, session and all.
- * An authorized route must never be prerendered.
- */
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
@@ -27,13 +21,13 @@ export async function generateMetadata({
 }
 
 export default async function DashboardPage({ params }: DashboardPageProps) {
-  const { locale } = await params;
+  const { locale, academy: academySlug } = await params;
   setRequestLocale(locale);
 
   const t = await getTranslations("dashboard");
   const tCircle = await getTranslations("circle");
 
-  const session = await requireTeacherSession("/dashboard");
+  const session = await requireTeacherSession(`/${academySlug}/dashboard`);
 
   if (!isActiveTeacher(session)) {
     return (
@@ -46,9 +40,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
 
   const supabase = await createClient();
   const [todayResult, allResult] = await Promise.all([
-    // Already filtered to circles that meet today in the circle's own timezone.
     supabase.rpc("teacher_today_circles"),
-    // RLS narrows this to the teacher's own circles (all circles for an admin).
     supabase.from("circles").select("*").eq("is_active", true).order("start_time"),
   ]);
 
@@ -56,10 +48,8 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   if (allResult.error) console.error("circles select failed", allResult.error);
 
   const todayCircles = todayResult.data ?? [];
-  const todayIds = new Set(todayCircles.map((circle) => circle.id));
-  const otherCircles: Circle[] = (allResult.data ?? []).filter(
-    (circle) => !todayIds.has(circle.id),
-  );
+  const todayIds = new Set(todayCircles.map((c) => c.id));
+  const otherCircles: Circle[] = (allResult.data ?? []).filter((c) => !todayIds.has(c.id));
 
   return (
     <div className="flex flex-col gap-6">
@@ -70,12 +60,26 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
           </h1>
           <p className="mt-2 text-muted-foreground">{t("subtitle")}</p>
         </div>
-        <Link href="/dashboard/new" className="btn-primary w-full sm:w-auto">
+        <Link href={`/${academySlug}/dashboard/new`} className="btn-primary w-full sm:w-auto">
           {t("newCircle")}
         </Link>
       </section>
 
-      <DashboardHeader teacher={session.teacher} />
+      <DashboardHeader teacher={session.teacher} academySlug={academySlug} />
+
+      {/* Admin link */}
+      {session.teacher.role === "admin" && (
+        <Link
+          href={`/${academySlug}/admin`}
+          className="flex items-center gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm font-medium text-brand-700 hover:bg-brand-100 dark:border-brand-800 dark:bg-brand-950 dark:text-brand-300"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Admin Panel
+        </Link>
+      )}
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">{t("today.title")}</h2>
@@ -92,9 +96,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                       {tCircle(`type.${circle.type}`)} ·{" "}
                       {t(`gender.${circle.gender_category}`)}
                     </p>
-                    <h3 className="truncate text-lg font-semibold">
-                      {circle.name}
-                    </h3>
+                    <h3 className="truncate text-lg font-semibold">{circle.name}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {tCircle("startsAt", { time: circle.start_time.slice(0, 5) })}
                     </p>
@@ -103,15 +105,14 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                     {t("joinedCount", { count: String(circle.joined_count) })}
                   </span>
                 </div>
-
                 <div className="flex flex-wrap items-center gap-2">
                   <Link
-                    href={`/dashboard/circle/${circle.id}`}
+                    href={`/${academySlug}/dashboard/circle/${circle.id}`}
                     className="btn-primary px-4 py-2 text-sm"
                   >
                     {t("manageSession")}
                   </Link>
-                  <CopyLinkButton path={`/circle/${circle.registration_slug}`} />
+                  <CopyLinkButton path={`/${academySlug}/circle/${circle.registration_slug}`} />
                 </div>
               </li>
             ))}
@@ -148,7 +149,7 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
                   </p>
                 </div>
                 <Link
-                  href={`/dashboard/circle/${circle.id}`}
+                  href={`/${academySlug}/dashboard/circle/${circle.id}`}
                   className="btn-secondary px-4 py-2 text-sm"
                 >
                   {t("openCircle")}

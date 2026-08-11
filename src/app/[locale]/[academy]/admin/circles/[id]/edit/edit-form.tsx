@@ -3,76 +3,78 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
-import { CopyLinkButton } from "@/components/copy-link-button";
-import { createCircle } from "./actions";
-import { initialNewCircleState, type NewCircleState } from "./state";
+import { Link } from "@/i18n/navigation";
+import { updateCircle } from "./actions";
 
 const CIRCLE_TYPES = ["tasheeh", "tajweed", "free_recitation"] as const;
-/** 0 = Sunday … 6 = Saturday, matching PostgreSQL's `dow`. */
 const DAYS = [0, 1, 2, 3, 4, 5, 6] as const;
-const DEFAULT_DAYS = [0, 1, 2, 3, 4];
 
 function SubmitButton() {
-  const t = useTranslations("dashboard.new");
   const { pending } = useFormStatus();
+  const t = useTranslations("admin.circles");
 
   return (
     <button type="submit" className="btn-primary w-full" disabled={pending}>
-      {pending ? t("submitting") : t("submit")}
+      {pending ? t("saving") : t("saveChanges")}
     </button>
   );
 }
 
-type CircleFormProps = {
-  defaultTimezone: string;
-  registrationSlug: string;
-  locale: string;
+type Teacher = {
+  id: string;
+  name: string;
+};
+
+type Circle = {
+  id: string;
+  name: string;
+  type: string;
+  gender_category: string;
+  session_link: string;
+  timezone: string;
+  start_time: string;
+  duration_minutes: number;
+  days_of_week: number[];
+  teacher_id: string;
+  is_active: boolean;
+};
+
+type EditCircleFormProps = {
+  circle: Circle;
+  teachers: Teacher[];
   academySlug: string;
 };
 
-export function CircleForm({
-  defaultTimezone,
-  registrationSlug,
-  locale,
-  academySlug,
-}: CircleFormProps) {
-  const t = useTranslations("dashboard.new");
+export function EditCircleForm({ circle, teachers, academySlug }: EditCircleFormProps) {
+  const t = useTranslations("admin.circles");
   const tCircle = useTranslations("circle");
   const tDashboard = useTranslations("dashboard");
+  const [state, formAction] = useActionState(updateCircle, { status: "idle" });
 
-  const createCircleWithSlug = createCircle.bind(null, registrationSlug);
-  const [state, formAction] = useActionState<NewCircleState, FormData>(
-    createCircleWithSlug,
-    initialNewCircleState,
-  );
+  const values = state.status === "idle" ? circle : (state as any).values || circle;
+  const fieldErrors = state.status === "invalid" ? (state as any).fieldErrors : {};
 
-  const values = state.status === "idle" ? null : state.values;
-  const fieldErrors = state.status === "invalid" ? state.fieldErrors : {};
-  const selectedDays = values?.days ?? DEFAULT_DAYS;
-  const circlePath = `/${locale}/circle/${registrationSlug}`;
-
-  function fieldError(key: keyof typeof fieldErrors) {
+  function fieldError(key: string) {
     const error = fieldErrors[key];
     if (!error) return null;
-    return <p className="mt-1.5 text-sm text-absent">{t(`errors.${error}`)}</p>;
+    return <p className="mt-1.5 text-sm text-absent">{error}</p>;
   }
 
   return (
     <form action={formAction} className="card flex flex-col gap-5" noValidate>
-      <input type="hidden" name="duration" value="60" />
-      <input type="hidden" name="timezone" value={defaultTimezone} />
+      <input type="hidden" name="circleId" value={circle.id} />
       <input type="hidden" name="academySlug" value={academySlug} />
 
       <div>
         <label className="field-label" htmlFor="name">
-          {t("fields.name")}
+          {t("circleName")}
         </label>
         <input
           id="name"
           name="name"
           className="input"
-          defaultValue={values?.name}
-          autoComplete="name"
+          defaultValue={values.name}
+          required
           aria-invalid={Boolean(fieldErrors.name)}
         />
         {fieldError("name")}
@@ -80,13 +82,13 @@ export function CircleForm({
 
       <div>
         <label className="field-label" htmlFor="type">
-          {t("fields.type")}
+          {t("type")}
         </label>
         <select
           id="type"
           name="type"
           className="input"
-          defaultValue={values?.type ?? "tasheeh"}
+          defaultValue={values.type}
         >
           {CIRCLE_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -98,7 +100,7 @@ export function CircleForm({
       </div>
 
       <fieldset>
-        <legend className="field-label">{t("fields.gender")}</legend>
+        <legend className="field-label">{t("gender")}</legend>
         <div className="flex gap-3">
           {(["male", "female"] as const).map((option) => (
             <label
@@ -113,22 +115,39 @@ export function CircleForm({
                 type="radio"
                 name="gender"
                 value={option}
-                defaultChecked={(values?.gender ?? "female") === option}
+                defaultChecked={values.gender_category === option}
                 className="accent-brand-600"
               />
               {tDashboard(`gender.${option}`)}
             </label>
           ))}
         </div>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          {t("fields.genderHint")}
-        </p>
         {fieldError("gender")}
       </fieldset>
 
       <div>
+        <label className="field-label" htmlFor="teacher">
+          {t("assignedTeacher")}
+        </label>
+        <select
+          id="teacher"
+          name="teacher_id"
+          className="input"
+          defaultValue={values.teacher_id}
+          required
+        >
+          {teachers.map((teacher) => (
+            <option key={teacher.id} value={teacher.id}>
+              {teacher.name}
+            </option>
+          ))}
+        </select>
+        {fieldError("teacher_id")}
+      </div>
+
+      <div>
         <label className="field-label" htmlFor="sessionLink">
-          {t("fields.sessionLink")}
+          {t("sessionLink")}
         </label>
         <input
           id="sessionLink"
@@ -138,18 +157,19 @@ export function CircleForm({
           inputMode="url"
           placeholder="meet.google.com/... or https://meet.google.com/..."
           className="input text-start"
-          defaultValue={values?.sessionLink}
+          defaultValue={values.session_link}
+          required
           autoComplete="off"
           aria-invalid={Boolean(fieldErrors.sessionLink)}
         />
         <p className="mt-1.5 text-sm text-muted-foreground">
-          {t("fields.sessionLinkHint")}
+          {t("sessionLinkHint")}
         </p>
         {fieldError("sessionLink")}
       </div>
 
       <fieldset>
-        <legend className="field-label">{t("fields.days")}</legend>
+        <legend className="field-label">{t("daysOfWeek")}</legend>
         <div className="flex flex-wrap gap-2">
           {DAYS.map((day) => (
             <label
@@ -164,7 +184,7 @@ export function CircleForm({
                 type="checkbox"
                 name="days"
                 value={day}
-                defaultChecked={selectedDays.includes(day)}
+                defaultChecked={values.days_of_week?.includes(day)}
                 className="accent-brand-600"
               />
               {tDashboard(`daysShort.${day}`)}
@@ -176,7 +196,7 @@ export function CircleForm({
 
       <div>
         <label className="field-label" htmlFor="startTime">
-          {t("fields.startTime")}
+          {t("startTime")}
         </label>
         <input
           id="startTime"
@@ -184,37 +204,66 @@ export function CircleForm({
           type="time"
           dir="ltr"
           className="input text-start"
-          defaultValue={values?.startTime ?? "17:00"}
+          defaultValue={values.start_time}
+          required
           aria-invalid={Boolean(fieldErrors.startTime)}
         />
         {fieldError("startTime")}
       </div>
 
       <div>
-        <label className="field-label" htmlFor="circleLink">
-          {t("fields.slug")}
+        <label className="field-label" htmlFor="duration">
+          {t("duration")}
         </label>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <input
-            id="circleLink"
-            dir="ltr"
-            className="input min-w-0 flex-1 text-start"
-            value={circlePath}
-            readOnly
-            aria-readonly="true"
-          />
-          <CopyLinkButton path={circlePath} />
-        </div>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          {t("fields.slugHint")}
-        </p>
+        <input
+          id="duration"
+          name="duration"
+          type="number"
+          min="5"
+          max="480"
+          className="input"
+          defaultValue={values.duration_minutes}
+          required
+          aria-invalid={Boolean(fieldErrors.duration)}
+        />
+        {fieldError("duration")}
       </div>
 
-      {state.status === "failed" && (
-        <p className="text-sm text-absent">{t(`errors.${state.reason}`)}</p>
+      <div>
+        <label className="field-label" htmlFor="status">
+          {t("status")}
+        </label>
+        <select
+          id="status"
+          name="status"
+          className="input"
+          defaultValue={values.is_active !== undefined ? (values.is_active ? "active" : "inactive") : (values.status ?? "active")}
+        >
+          <option value="active">{t("statusActive")}</option>
+          <option value="inactive">{t("statusInactive")}</option>
+        </select>
+        {fieldError("status")}
+      </div>
+
+      {state.status === "error" && (
+        <p className="text-sm text-absent">{(state as any).message}</p>
       )}
 
-      <SubmitButton />
+      {state.status === "success" && (
+        <p className="text-sm text-accent-600">{t("saved")}</p>
+      )}
+
+      <div className="flex gap-3">
+        <Link
+          href={`/${academySlug}/admin/circles`}
+          className="btn-secondary flex-1 text-center"
+        >
+          {t("cancel")}
+        </Link>
+        <div className="flex-1">
+          <SubmitButton />
+        </div>
+      </div>
     </form>
   );
 }

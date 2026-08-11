@@ -9,9 +9,9 @@ type Academy = {
   slug: string
   name_ar: string
   name_en: string
-  description_ar?: string
-  description_en?: string
-  logo_path?: string
+  description_ar: string | null
+  description_en: string | null
+  logo_path: string | null
   primary_color: string
   accent_color: string
 }
@@ -81,7 +81,7 @@ export function AcademySelector({ academies, locale }: Props) {
                   >
                     {t('nav.home')}
                     <svg
-                      className="h-5 w-5"
+                      className="h-5 w-5 rtl:rotate-180"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -90,7 +90,7 @@ export function AcademySelector({ academies, locale }: Props) {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d={locale === 'ar' ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
+                        d="M9 5l7 7-7 7"
                       />
                     </svg>
                   </div>

@@ -8,6 +8,7 @@ import type { CircleType, GenderCategory } from "@/lib/database.types";
 import { normalizeSessionLink } from "@/lib/circle-link";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
+import { getAcademyBySlug } from "@/lib/academy-dal";
 import type { CircleFieldErrors, CircleValues, NewCircleState } from "./state";
 
 const CIRCLE_TYPES: CircleType[] = ["tasheeh", "tajweed", "free_recitation"];
@@ -50,8 +51,6 @@ function validate(values: CircleValues): CircleFieldErrors {
     errors.sessionLink = "linkRequired";
   } else {
     const normalizedLink = normalizeSessionLink(values.sessionLink);
-
-    // A link the students cannot open is worse than no circle at all.
     try {
       const url = new URL(normalizedLink);
       if (url.protocol !== "http:" && url.protocol !== "https:") {
@@ -63,7 +62,6 @@ function validate(values: CircleValues): CircleFieldErrors {
   }
 
   if (!values.timezone) errors.timezone = "timezoneRequired";
-
   if (!TIME_PATTERN.test(values.startTime)) errors.startTime = "startTimeInvalid";
 
   const duration = Number(values.duration);
@@ -82,6 +80,7 @@ export async function createCircle(
   formData: FormData,
 ): Promise<NewCircleState> {
   const values = readValues(formData);
+  const academySlug = String(formData.get("academySlug") ?? "").trim();
 
   const fieldErrors = validate(values);
   if (Object.keys(fieldErrors).length > 0) {
@@ -92,8 +91,6 @@ export async function createCircle(
     return { status: "failed", values, reason: "notConfigured" };
   }
 
-  // A server action is a public endpoint: re-check authorization here rather
-  // than trusting that the page already did.
   const session = await getTeacherSession();
   if (!isActiveTeacher(session)) {
     return { status: "failed", values, reason: "forbidden" };
@@ -103,12 +100,18 @@ export async function createCircle(
     return { status: "failed", values, reason: "generic" };
   }
 
+  // Get academy id
+  const academy = academySlug ? await getAcademyBySlug(academySlug) : null;
+  if (!academy) {
+    return { status: "failed", values, reason: "generic" };
+  }
+
   const sessionLink = normalizeSessionLink(values.sessionLink);
 
   const supabase = await createClient();
   const { error } = await supabase.from("circles").insert({
-    // Never a form field — the brief is explicit about this.
     teacher_id: session.teacher.id,
+    academy_id: academy.id,
     name: values.name,
     type: values.type as CircleType,
     gender_category: values.gender as GenderCategory,
@@ -122,7 +125,6 @@ export async function createCircle(
 
   if (error) {
     console.error("circle insert failed", error);
-
     const reason =
       error.code === "23505"
         ? "slugTaken"
@@ -131,11 +133,10 @@ export async function createCircle(
           : error.code === "42501"
             ? "forbidden"
             : "generic";
-
     return { status: "failed", values, reason };
   }
 
   const locale = await getLocale();
-  revalidatePath("/dashboard");
-  return redirect({ href: "/dashboard", locale });
+  revalidatePath(`/${academySlug}/dashboard`);
+  return redirect({ href: `/${academySlug}/dashboard`, locale });
 }

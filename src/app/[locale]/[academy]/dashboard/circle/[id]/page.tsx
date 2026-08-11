@@ -3,14 +3,14 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { TeacherAccountNotice } from "@/components/teacher-account-notice";
-import { Link } from "@/i18n/navigation";
+import { BackLink } from "@/components/back-link";
 import { isActiveTeacher, requireTeacherSession } from "@/lib/auth/dal";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 import { SessionClient } from "./session-client";
 
 type SessionPageProps = {
-  params: Promise<{ locale: string; id: string }>;
+  params: Promise<{ locale: string; academy: string; id: string }>;
 };
 
 /** Authorized route: never prerender it. See the note in `../../page.tsx`. */
@@ -48,14 +48,14 @@ export async function generateMetadata({
 }
 
 export default async function TeacherSessionPage({ params }: SessionPageProps) {
-  const { locale, id } = await params;
+  const { locale, academy: academySlug, id } = await params;
   setRequestLocale(locale);
 
   const t = await getTranslations("session");
   const tCircle = await getTranslations("circle");
   const tDashboard = await getTranslations("dashboard");
 
-  const session = await requireTeacherSession(`/dashboard/circle/${id}`);
+  const session = await requireTeacherSession(`/${academySlug}/dashboard/circle/${id}`);
 
   if (!isActiveTeacher(session)) {
     return (
@@ -85,12 +85,9 @@ export default async function TeacherSessionPage({ params }: SessionPageProps) {
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <Link
-          href="/dashboard"
-          className="text-sm font-medium text-brand-600 dark:text-brand-300"
-        >
-          ← {tDashboard("backToDashboard")}
-        </Link>
+        <BackLink href={`/${academySlug}/dashboard`}>
+          {tDashboard("backToDashboard")}
+        </BackLink>
 
         <div className="card mt-2 border-brand-200 bg-brand-50 dark:border-brand-800 dark:bg-surface">
           <p className="text-sm text-muted-foreground">
@@ -115,7 +112,7 @@ export default async function TeacherSessionPage({ params }: SessionPageProps) {
             >
               {tCircle("openSession")}
             </a>
-            <CopyLinkButton path={`/circle/${circle.registration_slug}`} />
+            <CopyLinkButton path={`/${academySlug}/circle/${circle.registration_slug}`} />
           </div>
 
           {info && !info.meets_today && (

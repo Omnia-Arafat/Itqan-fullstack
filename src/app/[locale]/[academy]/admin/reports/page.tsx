@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
+import { BackLink } from "@/components/back-link";
 import { requireAdminSession } from "@/lib/auth/dal";
 import type {
   AttendanceReportRow,
@@ -92,12 +92,7 @@ export default async function ReportsPage({
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <Link
-          href="/admin"
-          className="text-sm font-medium text-brand-600 dark:text-brand-300"
-        >
-          ← {t("back")}
-        </Link>
+        <BackLink href="/admin">{t("back")}</BackLink>
         <h1 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
           {t("title")}
         </h1>

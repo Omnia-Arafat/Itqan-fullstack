@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { signOut } from "@/app/[locale]/login/actions";
+import { signOut } from "@/app/[locale]/[academy]/login/actions";
 
 /**
  * Two states that are neither an error nor a working session:
@@ -10,11 +10,15 @@ import { signOut } from "@/app/[locale]/login/actions";
 export async function TeacherAccountNotice({
   reason,
   email,
+  academySlug,
 }: {
   reason: "notLinked" | "inactive";
   email: string | null;
+  academySlug?: string;
 }) {
   const t = await getTranslations("auth");
+
+  const signOutWithAcademy = signOut.bind(null, academySlug ?? "");
 
   return (
     <div className="card border-accent-300 bg-accent-100 text-accent-700">
@@ -30,7 +34,7 @@ export async function TeacherAccountNotice({
         </p>
       )}
 
-      <form action={signOut} className="mt-4">
+      <form action={signOutWithAcademy} className="mt-4">
         <button type="submit" className="btn-secondary w-full sm:w-auto">
           {t("signOutAndSwitch")}
         </button>

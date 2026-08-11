@@ -1,20 +1,9 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import { cache } from 'react'
+import type { Academy } from '@/lib/database.types'
 
-export type Academy = {
-  id: string
-  slug: string
-  name_ar: string
-  name_en: string
-  description_ar: string | null
-  description_en: string | null
-  logo_path: string | null
-  primary_color: string
-  accent_color: string
-  is_active: boolean
-  created_at: string
-}
+export type { Academy }
 
 /**
  * Fetch all active academies
