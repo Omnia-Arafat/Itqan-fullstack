@@ -42,7 +42,7 @@ create index idx_students_academy on public.students (academy_id);
 -- 4. Insert default academies
 insert into public.academies (slug, name_ar, name_en, description_ar, description_en, logo_path, primary_color, accent_color)
 values 
-  ('itqan', 'أكاديمية إتقان', 'Itqan Academy', 'برنامج مجاني لحفظ القرآن الكريم', 'Free Quran memorization program', '/brand/mark.svg', '#2A8A66', '#C4913A'),
+  ('itqan', 'مقراءة إتقان الإلكترونية', 'Itqan Online Recitation', 'برنامج مجاني لحفظ القرآن الكريم', 'Free Quran memorization program', '/brand/mark.svg', '#2A8A66', '#C4913A'),
   ('sohbah', 'مقراءة صحبة الإلكترونية', 'Sohbah Online Recitation', 'برنامج تعليمي متكامل', 'Comprehensive educational program', '/assets/logos/sohbah-logo.webp', '#4A5568', '#D97706');
 
 -- 5. Update existing data to belong to Itqan academy

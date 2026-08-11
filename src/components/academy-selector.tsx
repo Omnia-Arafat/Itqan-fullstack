@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import Link from 'next/link'
+import { getAcademyNameFromMessages } from '@/lib/academy-display'
 
 type Academy = {
   id: string
@@ -23,6 +24,7 @@ type Props = {
 
 export function AcademySelector({ academies, locale }: Props) {
   const t = useTranslations()
+  const tAcademy = useTranslations('academy')
 
   return (
     <div className="py-12">
@@ -38,7 +40,12 @@ export function AcademySelector({ academies, locale }: Props) {
 
         <div className="grid gap-8 sm:grid-cols-2">
           {academies.map((academy) => {
-            const name = locale === 'ar' ? academy.name_ar : academy.name_en
+            const name = getAcademyNameFromMessages(
+              academy.slug,
+              locale,
+              academy,
+              tAcademy,
+            )
             const description = locale === 'ar' ? academy.description_ar : academy.description_en
 
             return (

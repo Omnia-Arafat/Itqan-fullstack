@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BrandMark } from "@/components/brand-mark";
 import { Link } from "@/i18n/navigation";
 import { getAcademyBySlug } from "@/lib/academy-dal";
+import { getLocalizedAcademyName } from "@/lib/academy-display";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
@@ -20,7 +21,7 @@ export default async function AcademyHome({ params }: AcademyHomeProps) {
   }
 
   const t = await getTranslations("home");
-  const academyName = locale === 'ar' ? academy.name_ar : academy.name_en;
+  const academyName = await getLocalizedAcademyName(academySlug, locale, academy);
 
   return (
     <div className="flex flex-col gap-6">

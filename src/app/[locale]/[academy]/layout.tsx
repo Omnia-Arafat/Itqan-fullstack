@@ -6,6 +6,7 @@ import { BrandMark } from "@/components/brand-mark";
 import { LanguageToggle } from "@/components/language-toggle";
 import { Link } from "@/i18n/navigation";
 import { getAcademyBySlug } from "@/lib/academy-dal";
+import { getLocalizedAcademyName } from "@/lib/academy-display";
 
 type AcademyLayoutProps = {
   children: React.ReactNode;
@@ -22,7 +23,7 @@ export async function generateMetadata({
     return { title: "Academy Not Found" };
   }
 
-  const academyName = locale === 'ar' ? academy.name_ar : academy.name_en;
+  const academyName = await getLocalizedAcademyName(academySlug, locale, academy);
   const description = locale === 'ar' 
     ? (academy.description_ar || academyName) 
     : (academy.description_en || academyName);
@@ -47,7 +48,7 @@ export default async function AcademyLayout({
     notFound();
   }
 
-  const academyName = locale === 'ar' ? academy.name_ar : academy.name_en;
+  const academyName = await getLocalizedAcademyName(academySlug, locale, academy);
   const academyTagline = locale === 'ar' 
     ? (academy.description_ar || '') 
     : (academy.description_en || '');

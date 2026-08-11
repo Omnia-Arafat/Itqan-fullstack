@@ -6,12 +6,14 @@
   },
   "academy": {
     "itqan": {
-      "name": "Itqan Academy",
-      "tagline": "Quran circles management platform"
+      "name": "Itqan Online Recitation",
+      "tagline": "Quran circles management platform",
+      "adminRole": "Itqan Admin"
     },
     "sohbah": {
       "name": "Sohbah Online Recitation",
-      "tagline": "Comprehensive educational platform"
+      "tagline": "Comprehensive educational platform",
+      "adminRole": "Sohbah Admin"
     },
     "select": "Select Academy",
     "switchAcademy": "Switch Academy"
