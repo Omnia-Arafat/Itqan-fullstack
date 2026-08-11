@@ -46,7 +46,11 @@ export default async function RegisterPage({
 
       {!isSupabaseConfigured() && <SetupNotice />}
 
-      <RegisterForm academyId={academy.id} circleSlug={circle ?? null} />
+      <RegisterForm
+        academyId={academy.id}
+        academySlug={academySlug}
+        circleSlug={circle ?? null}
+      />
     </div>
   );
 }

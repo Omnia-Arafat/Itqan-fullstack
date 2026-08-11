@@ -140,4 +140,52 @@
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1
            text-xs font-semibold bg-surface-muted text-muted-foreground;
   }
+
+  /* Circle page — smooth section enter/exit when joining the queue */
+  .motion-section {
+    overflow: hidden;
+    max-height: 1200px;
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+      margin-block 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .motion-section-hidden {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    margin-block: 0 !important;
+    pointer-events: none;
+  }
+
+  .motion-queue-item {
+    animation: queue-item-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  @keyframes queue-item-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-section,
+    .motion-queue-item {
+      animation: none;
+      transition: none;
+    }
+
+    .motion-section-hidden {
+      display: none;
+    }
+  }
 }

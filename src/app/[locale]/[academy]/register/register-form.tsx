@@ -47,7 +47,15 @@ function StudentIcon({ gender }: { gender: "male" | "female" }) {
   );
 }
 
-export function RegisterForm({ academyId, circleSlug }: { academyId: string; circleSlug: string | null }) {
+export function RegisterForm({
+  academyId,
+  academySlug,
+  circleSlug,
+}: {
+  academyId: string;
+  academySlug: string;
+  circleSlug: string | null;
+}) {
   const t = useTranslations("register");
   const [state, formAction] = useActionState<RegisterState, FormData>(
     registerStudent,
@@ -63,7 +71,7 @@ export function RegisterForm({ academyId, circleSlug }: { academyId: string; cir
         </p>
         {state.circleSlug ? (
           <Link
-            href={`/circle/${state.circleSlug}`}
+            href={`/${academySlug}/circle/${state.circleSlug}`}
             className="btn-primary mt-4 w-full sm:w-auto"
           >
             {t("success.backToCircle")}

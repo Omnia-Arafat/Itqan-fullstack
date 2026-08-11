@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CircleClient } from "./circle-client";
 
 type CirclePageProps = {
-  params: Promise<{ locale: string; slug: string }>;
+  params: Promise<{ locale: string; academy: string; slug: string }>;
 };
 
 async function loadCircle(slug: string) {
@@ -26,7 +26,7 @@ async function loadCircle(slug: string) {
 export async function generateMetadata({
   params,
 }: CirclePageProps): Promise<Metadata> {
-  const { locale, slug } = await params;
+  const { locale, academy: academySlug, slug } = await params;
   const t = await getTranslations({ locale, namespace: "circle" });
 
   if (!isSupabaseConfigured()) return { title: t("title") };
@@ -36,7 +36,7 @@ export async function generateMetadata({
 }
 
 export default async function CirclePage({ params }: CirclePageProps) {
-  const { locale, slug } = await params;
+  const { locale, academy: academySlug, slug } = await params;
   setRequestLocale(locale);
 
   const t = await getTranslations("circle");
@@ -69,16 +69,6 @@ export default async function CirclePage({ params }: CirclePageProps) {
           {t("startsAt", { time: circle.start_time.slice(0, 5) })}
         </p>
 
-        {/* Feature 4.7 — the session link is the first thing on the page. */}
-        <a
-          href={circle.session_link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary mt-4 w-full sm:w-auto"
-        >
-          {t("openSession")}
-        </a>
-
         {!circle.meets_today && (
           <p className="mt-3 text-sm text-accent-700 dark:text-accent-300">
             {t("notToday")}
@@ -87,9 +77,11 @@ export default async function CirclePage({ params }: CirclePageProps) {
       </section>
 
       <CircleClient
+        academySlug={academySlug}
         slug={slug}
         circleId={circle.id}
         sessionDate={circle.session_date}
+        sessionLink={circle.session_link}
         initialQueue={queue ?? []}
       />
     </div>
