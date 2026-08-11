@@ -6,6 +6,7 @@ import { requireTeacherSession, isActiveTeacher } from "@/lib/auth/dal";
 import { TeacherAccountNotice } from "@/components/teacher-account-notice";
 import { createClient } from "@/lib/supabase/server";
 import { getAcademyBySlug } from "@/lib/academy-dal";
+import { getAcademyAdminRole } from "@/lib/academy-display";
 import { notFound } from "next/navigation";
 
 type AdminPageProps = {
@@ -33,6 +34,7 @@ export default async function AdminPage({ params }: AdminPageProps) {
   }
 
   const t = await getTranslations("admin");
+  const adminRole = getAcademyAdminRole(academySlug, locale);
 
   const session = await requireTeacherSession(`/${academySlug}/admin`);
 
@@ -85,7 +87,9 @@ export default async function AdminPage({ params }: AdminPageProps) {
         <h1 className="font-display text-2xl font-bold sm:text-3xl">
           {t("title")}
         </h1>
-        <p className="mt-2 text-muted-foreground">{t("subtitle")}</p>
+        <p className="mt-2 text-muted-foreground">
+          {adminRole ?? t("subtitle")}
+        </p>
       </section>
 
       {/* Statistics */}

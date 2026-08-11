@@ -2,8 +2,9 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { getTeacherDisplayLabel } from "@/lib/academy-display";
 import { updateCircle } from "./actions";
 
 const CIRCLE_TYPES = ["tasheeh", "tajweed", "free_recitation"] as const;
@@ -23,6 +24,7 @@ function SubmitButton() {
 type Teacher = {
   id: string;
   name: string;
+  role: string;
 };
 
 type Circle = {
@@ -46,6 +48,7 @@ type EditCircleFormProps = {
 };
 
 export function EditCircleForm({ circle, teachers, academySlug }: EditCircleFormProps) {
+  const locale = useLocale();
   const t = useTranslations("admin.circles");
   const tCircle = useTranslations("circle");
   const tDashboard = useTranslations("dashboard");
@@ -138,7 +141,7 @@ export function EditCircleForm({ circle, teachers, academySlug }: EditCircleForm
         >
           {teachers.map((teacher) => (
             <option key={teacher.id} value={teacher.id}>
-              {teacher.name}
+              {getTeacherDisplayLabel(teacher, academySlug, locale)}
             </option>
           ))}
         </select>

@@ -64,7 +64,7 @@ export default async function EditCirclePage({ params }: EditCirclePageProps) {
 
   const { data: teachers } = await supabase
     .from("teachers")
-    .select("id, name")
+    .select("id, name, role")
     .eq("academy_id", academy.id)
     .eq("is_active", true)
     .order("name");

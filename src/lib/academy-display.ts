@@ -73,9 +73,11 @@ export function getAcademyNameFromMessages(
     ?? (locale === "ar" ? fallback.name_ar : fallback.name_en);
 }
 
+type TeacherLike = { name: string; role: string };
+
 /** Admin label follows the academy in the URL, not the name stored in the DB. */
 export function getTeacherDisplayLabel(
-  teacher: { name: string; role: string },
+  teacher: TeacherLike,
   academySlug: string | undefined,
   locale: string,
 ): string {

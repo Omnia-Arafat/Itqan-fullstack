@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BackLink } from "@/components/back-link";
 import { requireAdminSession } from "@/lib/auth/dal";
+import { getTeacherDisplayLabel } from "@/lib/academy-display";
 import type {
   AttendanceReportRow,
   Circle,
@@ -12,7 +13,7 @@ import { RANGE_PRESETS, resolveRange } from "@/lib/report-range";
 import { createClient } from "@/lib/supabase/server";
 
 type ReportsPageProps = {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; academy: string }>;
   searchParams: Promise<{
     range?: string;
     from?: string;
@@ -41,14 +42,14 @@ export default async function ReportsPage({
   params,
   searchParams,
 }: ReportsPageProps) {
-  const { locale } = await params;
+  const { locale, academy: academySlug } = await params;
   setRequestLocale(locale);
 
   const t = await getTranslations("reports");
   const tDashboard = await getTranslations("dashboard");
   const tCircle = await getTranslations("circle");
 
-  await requireAdminSession("/admin/reports");
+  await requireAdminSession(`/${academySlug}/admin/reports`);
 
   const query = await searchParams;
   const range = resolveRange(query);
@@ -92,7 +93,7 @@ export default async function ReportsPage({
   return (
     <div className="flex flex-col gap-6">
       <section>
-        <BackLink href="/admin">{t("back")}</BackLink>
+        <BackLink href={`/${academySlug}/admin`}>{t("back")}</BackLink>
         <h1 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
           {t("title")}
         </h1>
@@ -202,7 +203,7 @@ export default async function ReportsPage({
               <option value="">{t("filters.all")}</option>
               {teachers.map((teacher) => (
                 <option key={teacher.id} value={teacher.id}>
-                  {teacher.name}
+                  {getTeacherDisplayLabel(teacher, academySlug, locale)}
                 </option>
               ))}
             </select>
