@@ -4,6 +4,16 @@ Registration, a live recitation queue, and attendance tracking for Itqan
 Academy's Quran circles. Arabic-first with automatic RTL, English as a second
 locale.
 
+## 🆕 Multi-Academy Support
+
+This platform now supports **multiple academies** with complete data isolation:
+- **Itqan Academy** - Quran circles management (original)
+- **Sohbah Academy** - Comprehensive educational platform (new!)
+
+Each academy has its own students, teachers, circles, and branding, while sharing the same codebase.
+
+📖 **New to multi-academy setup?** See `CHECKLIST.md` for a 5-minute setup guide!
+
 `docs/PROJECT_BRIEF.md` is the specification. `docs/BRAND.md` covers the visual
 identity. `supabase/migrations/20260804150000_init.sql` is the source of truth
 for the data model.
@@ -119,3 +129,30 @@ Build from the directory's exact on-disk casing (`Itqan-fullstack`). Node keys
 modules by path string, so a case-mismatched working directory loads two copies
 of Next.js's internal async storage and every prerender fails with
 `Invariant: Expected workStore to be initialized`.
+
+## 📚 Multi-Academy Documentation
+
+Complete guides for the multi-academy architecture:
+
+| File | Purpose | Read When |
+|------|---------|-----------|
+| **`CHECKLIST.md`** | Quick setup checklist | Start here! 5-min guide |
+| **`SETUP_SOHBAH.md`** | Detailed setup instructions | Setting up Sohbah |
+| **`SOHBAH_README.md`** | Feature overview | Understanding capabilities |
+| **`SOHBAH_IMPLEMENTATION.md`** | Technical deep dive | Extending the system |
+| **`ARCHITECTURE.md`** | Visual architecture diagrams | Understanding structure |
+
+### Quick Start for Sohbah
+
+```bash
+# 1. Apply multi-academy migration
+npx supabase db push
+
+# 2. Start dev server
+npm run dev
+
+# 3. Visit http://localhost:3000
+# You'll see both Itqan and Sohbah academies!
+```
+
+See `CHECKLIST.md` for complete setup instructions.

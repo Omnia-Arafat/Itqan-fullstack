@@ -7,6 +7,7 @@ import { BrandMark } from "@/components/brand-mark";
 import { LanguageToggle } from "@/components/language-toggle";
 import { Link } from "@/i18n/navigation";
 import { localeDirection, routing, type Locale } from "@/i18n/routing";
+import { ConditionalLayout } from "@/components/conditional-layout";
 import "../globals.css";
 
 // Cairo carries both Arabic and Latin, so the two locales stay visually
@@ -81,32 +82,35 @@ export default async function LocaleLayout({
     >
       <body className="flex min-h-full flex-col font-sans">
         <NextIntlClientProvider>
-          <header className="border-b border-border-subtle bg-surface">
-            <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-4 px-4 py-3">
-              <Link href="/" className="flex items-center gap-3">
-                <BrandMark className="h-9 w-9 shrink-0" />
-                <span className="flex flex-col leading-tight">
-                  <span className="font-display text-lg font-bold text-brand-700 dark:text-brand-300">
-                    {t("name")}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {t("tagline")}
-                  </span>
-                </span>
-              </Link>
-              <LanguageToggle />
-            </div>
-          </header>
-
-          <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
+          <ConditionalLayout
+            header={
+              <header className="border-b border-border-subtle bg-surface">
+                <div className="mx-auto flex w-full max-w-4xl items-center justify-between gap-4 px-4 py-3">
+                  <Link href="/" className="flex items-center gap-3">
+                    <BrandMark className="h-9 w-9 shrink-0" />
+                    <span className="flex flex-col leading-tight">
+                      <span className="font-display text-lg font-bold text-brand-700 dark:text-brand-300">
+                        {t("name")}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {t("tagline")}
+                      </span>
+                    </span>
+                  </Link>
+                  <LanguageToggle />
+                </div>
+              </header>
+            }
+            footer={
+              <footer className="border-t border-border-subtle bg-surface">
+                <div className="mx-auto w-full max-w-4xl px-4 py-4 text-center text-xs text-muted-foreground">
+                  {t("name")}
+                </div>
+              </footer>
+            }
+          >
             {children}
-          </main>
-
-          <footer className="border-t border-border-subtle bg-surface">
-            <div className="mx-auto w-full max-w-4xl px-4 py-4 text-center text-xs text-muted-foreground">
-              {t("name")}
-            </div>
-          </footer>
+          </ConditionalLayout>
         </NextIntlClientProvider>
       </body>
     </html>

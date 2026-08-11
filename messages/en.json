@@ -4,6 +4,18 @@
     "tagline": "Quran circles management platform",
     "description": "Student registration, recitation queue, and attendance tracking in one place."
   },
+  "academy": {
+    "itqan": {
+      "name": "Itqan Academy",
+      "tagline": "Quran circles management platform"
+    },
+    "sohbah": {
+      "name": "Sohbah Academy",
+      "tagline": "Comprehensive educational platform"
+    },
+    "select": "Select Academy",
+    "switchAcademy": "Switch Academy"
+  },
   "language": {
     "label": "Language",
     "ar": "العربية",
@@ -293,6 +305,12 @@
       "note": "Accounts are created in Supabase and linked by hand — see supabase/seed/first-admin.sql.",
       "active": "Active",
       "inactive": "Deactivated"
+    },
+    "circleEdit": {
+      "title": "Edit circle",
+      "subtitle": "Update the circle settings or deactivate it for good.",
+      "open": "Edit",
+      "delete": "Delete circle"
     }
   },
   "reports": {

@@ -128,6 +128,12 @@ export default async function AdminPage({ params }: AdminPageProps) {
                   >
                     {tDashboard("manageSession")}
                   </Link>
+                  <Link
+                    href={`/admin/circle/${circle.id}/edit`}
+                    className="btn-secondary px-4 py-2 text-sm"
+                  >
+                    Edit
+                  </Link>
                   <CopyLinkButton path={`/circle/${circle.registration_slug}`} />
                   <Link
                     href={`/admin/reports?circle=${circle.id}`}
